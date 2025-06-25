@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美業儲值方案分析總結</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8ddd4 100%);
+            min-height: 100vh;
+            color: #5d4e37;
+            font-size: 16px;
+            padding-top: 60px;
+            padding-bottom: 80px;
+        }
+        
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            padding: 0 15px;
+        }
+        
+        .page-header {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: #8b7355;
+            text-align: center;
+            opacity: 0.9;
+            z-index: 200;
+            background: rgba(250, 248, 245, 0.95);
+            padding: 8px 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 300px;
+        }
+        
+        .page {
+            background: #faf8f5;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(139, 115, 85, 0.1);
+            border: 1px solid #e8ddd4;
+            min-height: calc(100vh - 140px);
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+            position: relative;
+            margin: 10px 0;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            text-align: center;
+            color: #8b7355;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #d4c4a8;
+            padding-bottom: 15px;
+            line-height: 1.3;
+        }
+        
+        h2 {
+            color: #8b7355;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        h3 {
+            color: #8b7355;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        
+        .comparison-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .plan-card {
+            background: #f9f6f2;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e8ddd4;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .plan-title {
+            font-size: 1.4em;
+            color: #8b7355;
+            margin-bottom: 15px;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d4c4a8;
+        }
+        
+        .money-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            padding: 15px;
+            background: #f5f0e8;
+            border-radius: 8px;
+        }
+        
+        .money-flow-horizontal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .concept-text {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0ebe3;
+            border-radius: 8px;
+            font-style: italic;
+            color: #6b5b47;
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            position: relative;
+            padding-left: 25px;
+            line-height: 1.5;
+            font-size: 1em;
+        }
+        
+        .feature-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #c4a484;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .warning-section {
+            background: #f5e6d8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #d4a574;
+        }
+        
+        .problem-section {
+            background: #f5e6e6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #c4a4a4;
+        }
+        
+        .info-section {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #a4c4a4;
+        }
+        
+        .recommendation-section {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #a4c4a4;
+        }
+        
+        .example-flow {
+            text-align: center;
+            margin: 20px 0;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+        
+        .calculation-demo {
+            text-align: center;
+            margin: 20px auto;
+            font-size: 1.2em;
+            line-height: 1.8;
+            max-width: 300px;
+        }
+        
+        .calculation-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .calculation-card {
+            background: #f9f6f2;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e8ddd4;
+            text-align: center;
+        }
+        
+        .highlight-red {
+            color: #8b1538;
+            font-weight: bold;
+        }
+        
+        .highlight-green {
+            color: #2d5016;
+            font-weight: bold;
+        }
+        
+        .highlight-orange {
+            color: #8b4513;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+            width: 90%;
+            max-width: 300px;
+        }
+        
+        .nav-btn {
+            background: #8b7355;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .nav-btn:hover {
+            background: #6b5b47;
+            transform: translateY(-1px);
+        }
+        
+        .nav-btn:disabled {
+            background: #d4c4a8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .page-indicator {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: #e8ddd4;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: #8b7355;
+        }
+        
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            min-height: auto;
+        }
+        
+        .scenario-content {
+            margin: 20px 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .service-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .service-card {
+            text-align: center;
+            padding: 15px;
+            background: #f9f6f2;
+            border-radius: 8px;
+            font-size: 1.1em;
+        }
+        
+        .highlight-box {
+            background: #ffe6cc;
+            border: 2px solid #ff9900;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #cc6600;
+            margin: 15px 0;
+        }
+        
+        .special-highlight {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        
+        /* 手機橫向時的調整 */
+        @media screen and (orientation: landscape) and (max-height: 500px) {
+            .page {
+                min-height: calc(100vh - 100px);
+            }
+            
+            .navigation {
+                bottom: 10px;
+            }
+        }
+        
+        /* 超小螢幕調整 */
+        @media screen and (max-width: 320px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .page {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.6em;
+            }
+            
+            h2 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <span class="orbitron">i-SO POS</span> | zoom-world.tw
+    </div>
+
+    <div class="container">
+        <div class="page-indicator">
+            <span id="currentPage">1</span> / <span id="totalPages">6</span>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="center-content">
+                <h1>美業常見的儲值方式有兩種</h1>
+                
+                <div class="comparison-section">
+                    <div class="plan-card">
+                        <div class="plan-title">📈 擴增式儲值</div>
+                        <div style="font-size: 1.1em; line-height: 1.6; color: #6b5b47;">
+                            店家直接贈送額外點數給顧客<br><br>
+                            <div style="margin: 10px 0; padding: 12px; background: #f5f0e8; border-radius: 6px; font-size: 0.95em; text-align: left;">
+                                • 儲值 1萬 → 贈送 1千<br>
+                                • 儲值 2萬 → 贈送 3千<br>
+                                • 儲值 3萬 → 贈送 5千<br>
+                                <span style="color: #c4a484;">以此類推...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="plan-card">
+                        <div class="plan-title">💰 折扣式儲值</div>
+                        <div style="font-size: 1.1em; line-height: 1.6; color: #6b5b47;">
+                            不預先增加點數，消費時才享受折扣<br><br>
+                            <div style="margin: 10px 0; padding: 12px; background: #f5f0e8; border-radius: 6px; font-size: 0.95em; text-align: left;">
+                                • 儲值 1萬 → 消費享95折<br>
+                                • 儲值 2萬 → 消費享9折<br>
+                                • 儲值 3萬 → 消費享85折<br>
+                                <span style="color: #c4a484;">以此類推...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin: 40px 0; padding: 20px; background: #e8f5e8; border-radius: 10px; font-size: 1.1em;">
+                    <strong>👆 向右滑動了解詳細說明</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="center-content">
+                <h2>為什麼店家常選擇「擴增式」？</h2>
+                
+                <div style="text-align: center; margin: 30px 0; font-size: 1.2em; line-height: 1.6;">
+                    因為想讓顧客儲值時<br>
+                    <span class="highlight-orange">「當下」就有感受惠</span><br>
+                    增加儲值誘因
+                </div>
+                
+                <div class="warning-section">
+                    <h3>⚠️ 但，擴增式的隱憂其實很大</h3>
+                    <div style="font-size: 1.1em; text-align: center; margin: 15px 0; line-height: 1.5;">
+                        <strong>因為【贈送儲值金】等同贈送「折價券」</strong><br><br>
+                        <span class="highlight-red">其實是跟顧客「少收錢」</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="center-content">
+                <h2>擴增式的實際問題</h2>
+                
+                <div style="text-align: center; margin: 20px 0; font-size: 1.1em;">
+                    <strong>情境舉例：假設【贈送儲值金 $1,000】</strong>
+                </div>
+                
+                <div class="example-flow">
+                    <div style="margin: 20px 0; padding: 15px; background: #f9f6f2; border-radius: 8px;">
+                        👤 <strong>顧客消費 $3,400</strong><br>
+                        因儲值餘額不足，部分以現金支付
+                    </div>
+                    
+                    <div style="margin: 20px 0; padding: 15px; background: #f5f0e8; border-radius: 8px;">
+                        💵 付現 $2,400<br>
+                        <span style="color: #c4a484;">+</span><br>
+                        🎁 扣點 $1,000 (贈送)<br>
+                        <span style="color: #c4a484;">=</span><br>
+                        💰 營業額 $3,400
+                    </div>
+                    
+                    <div style="margin: 25px 0; padding: 20px; background: #fff3cd; border: 2px dashed #d4c4a8; border-radius: 8px;">
+                        店家實收 <span class="highlight-red">僅 $2,400</span><br>
+                        但帳面顯示 <span class="highlight-green">$3,400</span>
+                    </div>
+                    
+                    <div class="highlight-red" style="font-size: 1.2em; margin-top: 20px;">
+                        ❌ 數據不準確！實際沒收到那 $1,000
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="center-content">
+                <h2>兩種方案的計算差異</h2>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="font-size: 1.1em; margin: 15px 0; padding: 15px; background: #f9f6f2; border-radius: 8px;">
+                        👨‍💼 <strong>假設員工本月總業績 $150,000</strong><br><br>
+                        💵 現金/刷卡 $100,000<br>
+                        <span style="color: #c4a484;">+</span><br>
+                        🎫 儲值扣點 $50,000
+                    </div>
+                </div>
+
+                <div class="calculation-section">
+                    <div class="calculation-card">
+                        <h3>擴增式計算</h3>
+                        <div class="calculation-demo">
+                            $100,000 + $50,000 × <span style="background: #ff6b6b; color: white; padding: 4px 8px; border-radius: 6px; font-weight: bold;">0.9</span><br>
+                            <span style="color: #c4a484; font-size: 1.2em;">=</span><br>
+                            <span class="highlight-red">$145,000</span>
+                        </div>
+                        <div style="color: #8b4513; font-weight: bold; margin-top: 10px;">
+                            需扣除贈送成本
+                        </div>
+                    </div>
+                    
+                    <div class="calculation-card">
+                        <h3>折扣式計算</h3>
+                        <div class="calculation-demo">
+                            $100,000 + $50,000<br>
+                            <span style="color: #c4a484; font-size: 1.2em;">=</span><br>
+                            <span class="highlight-green">$150,000</span>
+                        </div>
+                        <div style="color: #2d5016; font-weight: bold; margin-top: 10px;">
+                            簡單明確
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="warning-section">
+                    <h3>⚠️ 為什麼 擴增式 的 扣點業績 要 × 0.9？</h3>
+                    <div style="font-size: 1.1em; line-height: 1.6; margin: 15px 0;">
+                        因為店家贈送了10%額外點數給顧客<br><br>
+                        <span class="highlight-orange">等於每1元儲值點數，店家實際只收到0.9元</span><br><br>
+                        所以有些店家想從員工業績中扣除這個贈送成本<br><br>
+                        <div class="highlight-box">
+                            💡 乍看之下好像沒問題？但是 ...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="center-content">
+                <h2>沙龍業獨有的特殊情況</h2>
+                
+                <div class="problem-section">
+                    <div style="font-size: 1.1em; text-align: center; margin: 20px 0;">
+                        <strong>🏪 沙龍店的營收來源與獎金計算方式有兩種</strong>
+                    </div>
+                    
+                    <div class="service-cards">
+                        <div class="service-card">
+                            💇‍♀️<br><strong>技術服務</strong><br>
+                            例如：洗髮、剪髮、染燙<br>
+                            <span style="color: #8b4513; font-weight: bold; margin-top: 10px; display: block;">抽成 40%</span>
+                        </div>
+                        <div class="service-card">
+                            🧴<br><strong>店販商品</strong><br>
+                            例如：洗髮精、護髮產品<br>
+                            <span style="color: #8b4513; font-weight: bold; margin-top: 10px; display: block;">抽成 (售價-成本)×50%</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 20px 0; font-size: 1.1em; line-height: 1.6; padding: 15px; background: #fff; border-radius: 8px;">
+                        <strong>實際情境：</strong>顧客今天消費 $4,000<br>
+                        • 技術服務 $3,000 (設計師A負責)<br>
+                        • 店販商品 $1,000 (助理B販售)<br><br>
+                        
+                        <strong>付款方式：</strong><br>
+                        🎫儲值 $1,200 + 💵現金 $2,800<br><br>
+                        
+                        <span class="highlight-red">問題來了：</span><br>
+                        這 $1,200 儲值點數算是<br>
+                        設計師A的業績？還是助理B的業績？
+                    </div>
+                    
+                    <div class="special-highlight">
+                        ⚠️ <strong>重要：</strong>因為技術與店販的抽成不同，點數歸屬會直接影響員工實際獎金多寡
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="center-content">
+                <div class="recommendation-section">
+                    <h3>✅ 總結</h3>
+                    <div style="font-size: 1.1em; line-height: 1.6; margin: 15px 0;">
+                        使用<strong>折扣式</strong>最簡單明瞭，適合永續經營的沙龍店家
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3>💡 建議</h3>
+                    <div style="font-size: 1.1em; line-height: 1.6; margin: 15px 0;">
+                        <strong>無論是儲值或購買計次券，都是屬於「預付」消費</strong><br><br>
+                        
+                        在顧客實際消費時，員工才會獲得業績才公平<br><br>
+                        
+                        <span class="highlight-red">千萬不要在顧客購買時，就全部業績都給員工</span><br><br>
+                        
+                        因為無法預期每次消費是否都是同一人，或是無法保證員工永遠不會離開
+                    </div>
+                </div>
+                
+                <div class="warning-section">
+                    <h3>🎁 談成獎勵</h3>
+                    <div style="font-size: 1.1em; line-height: 1.6; margin: 15px 0; text-align: center;">
+                        若仍想要發放談成獎勵給員工<br><br>
+                        <span style="font-size: 1.2em; font-weight: bold; color: #8b7355;">建議加發 1-3% 左右的談成獎金即可</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changePage(-1)">← 上一頁</button>
+            <button class="nav-btn" id="nextBtn" onclick="changePage(1)">下一頁 →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 6;
+
+        function updatePageDisplay() {
+            // 隱藏所有頁面
+            for (let i = 1; i <= totalPages; i++) {
+                document.getElementById(`page${i}`).classList.remove('active');
+            }
+            
+            // 顯示當前頁面
+            document.getElementById(`page${currentPage}`).classList.add('active');
+            
+            // 更新頁碼顯示
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+            
+            // 更新按鈕狀態
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        }
+
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                updatePageDisplay();
+            }
+        }
+
+        // 鍵盤導航
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') changePage(-1);
+            if (e.key === 'ArrowRight') changePage(1);
+        });
+
+        // 觸控滑動支援
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleGesture();
+        });
+
+        function handleGesture() {
+            const swipeThreshold = 50;
+            const swipeDistance = touchEndX - touchStartX;
+            
+            if (Math.abs(swipeDistance) > swipeThreshold) {
+                if (swipeDistance > 0) {
+                    // 右滑，上一頁
+                    changePage(-1);
+                } else {
+                    // 左滑，下一頁
+                    changePage(1);
+                }
+            }
+        }
+
+        // 初始化
+        updatePageDisplay();
+    </script>
+</body>
+</html>
